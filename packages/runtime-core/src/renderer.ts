@@ -350,8 +350,8 @@ function baseCreateRenderer(
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
   const patch: PatchFn = (
-    n1,
-    n2,
+    n1, // 老节点
+    n2, // 新节点
     container,
     anchor = null,
     parentComponent = null,
@@ -1154,6 +1154,7 @@ function baseCreateRenderer(
     optimized: boolean
   ) => {
     n2.slotScopeIds = slotScopeIds
+    // 首次渲染，传入n1是null
     if (n1 == null) {
       if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
         ;(parentComponent!.ctx as KeepAliveContext).activate(
@@ -1164,6 +1165,7 @@ function baseCreateRenderer(
           optimized
         )
       } else {
+        // 首次我们会挂载根组件
         mountComponent(
           n2,
           container,
@@ -1192,6 +1194,9 @@ function baseCreateRenderer(
     // mounting
     const compatMountInstance =
       __COMPAT__ && initialVNode.isCompatRoot && initialVNode.component
+    
+    // 组件挂载过程：
+    // 1. 组件实例
     const instance: ComponentInternalInstance =
       compatMountInstance ||
       (initialVNode.component = createComponentInstance(
@@ -1219,6 +1224,7 @@ function baseCreateRenderer(
       if (__DEV__) {
         startMeasure(instance, `init`)
       }
+      // 2.初始化组件实例
       setupComponent(instance)
       if (__DEV__) {
         endMeasure(instance, `init`)
@@ -1239,6 +1245,11 @@ function baseCreateRenderer(
       return
     }
 
+    // 获取vnode
+    // 1.创建一个组件更新函数
+    //   1.1.render获得vnode
+    //   1.2.patch(oldvnode, vnode)
+    // 2.创建更新机制：new ReactiveEffect(更新函数)
     setupRenderEffect(
       instance,
       initialVNode,
@@ -1299,6 +1310,7 @@ function baseCreateRenderer(
     isSVG,
     optimized
   ) => {
+    // 1.创建更新函数
     const componentUpdateFn = () => {
       if (!instance.isMounted) {
         let vnodeHook: VNodeHook | null | undefined
@@ -1538,12 +1550,14 @@ function baseCreateRenderer(
     }
 
     // create reactive effect for rendering
+    // 2.创建更新机制
     const effect = (instance.effect = new ReactiveEffect(
       componentUpdateFn,
       () => queueJob(instance.update),
       instance.scope // track it in component's effect scope
     ))
 
+    // 获取更新函数
     const update = (instance.update = effect.run.bind(effect) as SchedulerJob)
     update.id = instance.uid
     // allowRecurse
@@ -1561,6 +1575,7 @@ function baseCreateRenderer(
       update.ownerInstance = instance
     }
 
+    // 3.首次执行组件更新
     update()
   }
 
@@ -2296,12 +2311,15 @@ function baseCreateRenderer(
     return hostNextSibling((vnode.anchor || vnode.el)!)
   }
 
+  // 首次渲染
   const render: RootRenderFunction = (vnode, container, isSVG) => {
     if (vnode == null) {
       if (container._vnode) {
         unmount(container._vnode, null, null, true)
       }
     } else {
+      // 首次执行，传入根组件vnode，参数1是null
+      // 所以首次执行挂载过程
       patch(container._vnode || null, vnode, container, null, null, null, isSVG)
     }
     flushPostFlushCbs()
@@ -2329,9 +2347,12 @@ function baseCreateRenderer(
     )
   }
 
+  // 返回渲染器对象
+  // ReactDOM.render(<App></App>, '#app')
   return {
-    render,
-    hydrate,
+    render, // 把接收到的vnode转换成dom，追加到宿主元素
+    hydrate,// SSR, 服务端将一个vnode生成为html
+    // 创建App实例
     createApp: createAppAPI(render, hydrate)
   }
 }
