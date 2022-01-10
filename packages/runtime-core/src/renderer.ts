@@ -1181,6 +1181,7 @@ function baseCreateRenderer(
     }
   }
 
+  // 挂载组件
   const mountComponent: MountComponentFn = (
     initialVNode,
     container,
@@ -1224,7 +1225,10 @@ function baseCreateRenderer(
       if (__DEV__) {
         startMeasure(instance, `init`)
       }
-      // 2.初始化组件实例
+      // 2.初始化组件实例：
+          // 2.1 setup
+          // 2.1.1 编译render选项
+          // 2.2 apllyOptios
       setupComponent(instance)
       if (__DEV__) {
         endMeasure(instance, `init`)
@@ -1562,7 +1566,7 @@ function baseCreateRenderer(
     update.id = instance.uid
     // allowRecurse
     // #1801, #2043 component render effects should allow recursive updates
-    toggleRecurse(instance, true)
+    toggleRecurse(instance, true) 
 
     if (__DEV__) {
       effect.onTrack = instance.rtc

@@ -1,0 +1,21 @@
+<div id="app">
+  <h1>{{title}}</h1>
+</div>
+
+<!-- format global  iife -->
+<script src="../dist/vue.global.js"></script>
+<script>
+  Vue.createApp({
+    data() {
+      return {
+        title: 'vue3初始化流程1'
+      }
+    },
+    setup() {
+      return {
+        title: 'vue3初始化流程2'
+      }
+      // return () => {}
+    }
+  }).mount('#app')
+</script>
