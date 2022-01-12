@@ -418,6 +418,7 @@ function baseCreateRenderer(
             optimized
           )
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
+          // 初始化首次走这里
           processComponent(
             n1,
             n2,
@@ -602,6 +603,7 @@ function baseCreateRenderer(
     }
   }
 
+  // 创建一个元素
   const mountElement = (
     vnode: VNode,
     container: RendererElement,
@@ -614,6 +616,7 @@ function baseCreateRenderer(
   ) => {
     let el: RendererElement
     let vnodeHook: VNodeHook | undefined | null
+    // 获取要创建元素的类型type
     const { type, props, shapeFlag, transition, patchFlag, dirs } = vnode
     if (
       !__DEV__ &&
@@ -627,6 +630,7 @@ function baseCreateRenderer(
       // only do this in production since cloned trees cannot be HMR updated.
       el = vnode.el = hostCloneNode(vnode.el)
     } else {
+      // 首次创建一个新节点
       el = vnode.el = hostCreateElement(
         vnode.type as string,
         isSVG,
@@ -637,8 +641,10 @@ function baseCreateRenderer(
       // mount children first, since some props may rely on child content
       // being already rendered, e.g. `<select value>`
       if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+        // node.textContent = 'xxx'
         hostSetElementText(el, vnode.children as string)
       } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // 如果存在子元素，则向下递归
         mountChildren(
           vnode.children as VNodeArrayChildren,
           el,
@@ -655,6 +661,7 @@ function baseCreateRenderer(
         invokeDirectiveHook(vnode, null, parentComponent, 'created')
       }
       // props
+      // 如果元素有属性，则初始化这些属性
       if (props) {
         for (const key in props) {
           if (key !== 'value' && !isReservedProp(key)) {
@@ -712,6 +719,7 @@ function baseCreateRenderer(
     if (needCallTransitionHooks) {
       transition!.beforeEnter(el)
     }
+    // 追加到父元素上去
     hostInsert(el, container, anchor)
     if (
       (vnodeHook = props && props.onVnodeMounted) ||
@@ -1316,6 +1324,9 @@ function baseCreateRenderer(
   ) => {
     // 1.创建更新函数
     const componentUpdateFn = () => {
+      // 首次执行时走isMounted这个流程
+      // render -> vnode
+      // patch(vnode) -> dom
       if (!instance.isMounted) {
         let vnodeHook: VNodeHook | null | undefined
         const { el, props } = initialVNode
@@ -1348,6 +1359,7 @@ function baseCreateRenderer(
             if (__DEV__) {
               startMeasure(instance, `render`)
             }
+            // 执行当前组件实例的render函数获取vnode
             instance.subTree = renderComponentRoot(instance)
             if (__DEV__) {
               endMeasure(instance, `render`)
@@ -1382,6 +1394,7 @@ function baseCreateRenderer(
           if (__DEV__) {
             startMeasure(instance, `render`)
           }
+          // 执行render函数
           const subTree = (instance.subTree = renderComponentRoot(instance))
           if (__DEV__) {
             endMeasure(instance, `render`)
@@ -1389,6 +1402,7 @@ function baseCreateRenderer(
           if (__DEV__) {
             startMeasure(instance, `patch`)
           }
+          // 首选patch，将创建这些子元素
           patch(
             null,
             subTree,
@@ -1556,7 +1570,7 @@ function baseCreateRenderer(
     // create reactive effect for rendering
     // 2.创建更新机制
     const effect = (instance.effect = new ReactiveEffect(
-      componentUpdateFn,
+      componentUpdateFn, // 此函数在响应式数据变化时会再次执行
       () => queueJob(instance.update),
       instance.scope // track it in component's effect scope
     ))
