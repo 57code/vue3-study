@@ -1,0 +1,28 @@
+<div id="app">
+  <h1 :title="title">{{title}}</h1>
+  <comp foo="foo" bar="bar"></comp>
+</div>
+
+<!-- format global  iife -->
+<script src="../dist/vue.global.js"></script>
+<script>
+  Vue.createApp({
+    data() {
+      return {
+        title: 'vue3初始化流程1'
+      }
+    },
+    // render() {
+    //   return Vue.h('h1', this.title)
+    // }
+  })
+  .component('comp', {
+    props: ['foo'],
+    template: `
+      <div>comp</div>
+      <p>{{foo}}</p>
+      <p>{{$attrs.bar}}</p>
+    `
+  })
+  .mount('#app')
+</script>

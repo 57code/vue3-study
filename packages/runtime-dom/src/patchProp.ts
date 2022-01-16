@@ -10,6 +10,7 @@ const nativeOnRE = /^on[a-z]/
 
 type DOMRendererOptions = RendererOptions<Node, Element>
 
+// 元素节点属性更新
 export const patchProp: DOMRendererOptions['patchProp'] = (
   el,
   key,

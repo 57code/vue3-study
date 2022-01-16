@@ -6,6 +6,7 @@ const doc = (typeof document !== 'undefined' ? document : null) as Document
 
 const staticTemplateCache = new Map<string, DocumentFragment>()
 
+// 浏览器平台所有节点操作
 export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
   insert: (child, parent, anchor) => {
     parent.insertBefore(child, anchor || null)

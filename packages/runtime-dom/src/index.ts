@@ -42,6 +42,7 @@ let enabledHydration = false
 function ensureRenderer() {
   return (
     renderer ||
+    // 创建渲染器实例同时传入当前平台特有的节点操作
     (renderer = createRenderer<Node, Element | ShadowRoot>(rendererOptions))
   )
 }
