@@ -585,6 +585,7 @@ export function setupComponent(
 ) {
   isInSSRComponentSetup = isSSR
 
+  // 组件的初始化就是孩子和属性的初始化
   const { props, children } = instance.vnode
   const isStateful = isStatefulComponent(instance)
   // 属性和插槽初始化

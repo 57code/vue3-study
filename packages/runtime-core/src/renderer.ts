@@ -1466,6 +1466,7 @@ function baseCreateRenderer(
         // #2458: deference mount-only object parameters to prevent memleaks
         initialVNode = container = anchor = null as any
       } else {
+        // 更新组件流程开始
         // updateComponent
         // This is triggered by mutation of component's own state (next: null)
         // OR parent calling processComponent (next: VNode)
@@ -1505,16 +1506,20 @@ function baseCreateRenderer(
         if (__DEV__) {
           startMeasure(instance, `render`)
         }
+        // 再次执行render，获取最新的结果vnode
         const nextTree = renderComponentRoot(instance)
         if (__DEV__) {
           endMeasure(instance, `render`)
         }
+        // 获取上次的render计算结果
         const prevTree = instance.subTree
         instance.subTree = nextTree
 
         if (__DEV__) {
           startMeasure(instance, `patch`)
         }
+        // diff
+        // 根据新老vnode之间的不同，判断出所要做的精确的dom操作
         patch(
           prevTree,
           nextTree,
@@ -1569,6 +1574,8 @@ function baseCreateRenderer(
 
     // create reactive effect for rendering
     // 2.创建更新机制
+    // 副作用：如果componentUpdateFn执行的过程中有响应式数据发生变化
+    // 则按照参数2的(() => queueJob(instance.update))方式执行参数1
     const effect = (instance.effect = new ReactiveEffect(
       componentUpdateFn, // 此函数在响应式数据变化时会再次执行
       () => queueJob(instance.update),
