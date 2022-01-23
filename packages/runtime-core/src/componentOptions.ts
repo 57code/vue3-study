@@ -644,6 +644,7 @@ export function applyOptions(instance: ComponentInternalInstance) {
     }
   }
 
+  // data选项处理部分
   if (dataOptions) {
     if (__DEV__ && !isFunction(dataOptions)) {
       warn(
@@ -651,6 +652,8 @@ export function applyOptions(instance: ComponentInternalInstance) {
           `Plain object usage is no longer supported.`
       )
     }
+    // 立刻调用data这个函数，返回一个对象
+    // 这个对象会被做响应式处理
     const data = dataOptions.call(publicThis, publicThis)
     if (__DEV__ && isPromise(data)) {
       warn(
@@ -659,9 +662,11 @@ export function applyOptions(instance: ComponentInternalInstance) {
           `async setup() + <Suspense>.`
       )
     }
+    // 返回必须是对象
     if (!isObject(data)) {
       __DEV__ && warn(`data() should return an object.`)
     } else {
+      // 直接调用reactive()，做响应式处理
       instance.data = reactive(data)
       if (__DEV__) {
         for (const key in data) {

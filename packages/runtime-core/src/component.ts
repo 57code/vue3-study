@@ -821,6 +821,7 @@ export function finishComponentSetup(
   if (__FEATURE_OPTIONS_API__ && !(__COMPAT__ && skipOptions)) {
     setCurrentInstance(instance)
     pauseTracking()
+    // 兼容vue2 options api
     applyOptions(instance)
     resetTracking()
     unsetCurrentInstance()

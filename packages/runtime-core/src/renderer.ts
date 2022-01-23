@@ -1235,8 +1235,9 @@ function baseCreateRenderer(
       }
       // 2.初始化组件实例：
           // 2.1 setup
-          // 2.1.1 编译render选项
-          // 2.2 apllyOptios
+          //   2.1.1 编译render选项
+          // 2.2 apllyOptions
+          //   2.2.1 data/props/methods/computed/watch 响应式
       setupComponent(instance)
       if (__DEV__) {
         endMeasure(instance, `init`)
@@ -1583,6 +1584,7 @@ function baseCreateRenderer(
     ))
 
     // 获取更新函数
+    // 拿出run函数，它可以立刻执行
     const update = (instance.update = effect.run.bind(effect) as SchedulerJob)
     update.id = instance.uid
     // allowRecurse
